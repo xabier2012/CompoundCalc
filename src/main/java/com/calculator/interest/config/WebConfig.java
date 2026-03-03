@@ -39,6 +39,7 @@ public class WebConfig implements WebMvcConfigurer {
         resolver.setCookiePath("/");
         resolver.setCookieMaxAge(Duration.ofDays(365));
         resolver.setCookieSameSite("Lax");
+        resolver.setCookieSecure(true);
         return resolver;
     }
 
