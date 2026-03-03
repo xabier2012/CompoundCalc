@@ -1,0 +1,123 @@
+/* Custom styles – complements Bootstrap 5.3 with app-specific tweaks. */
+
+/* ---- Layout ---- */
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* ---- Feature icon (landing page) ---- */
+.feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
+}
+
+/* ---- Card hover lift ---- */
+.card-hover {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.12) !important;
+}
+
+/* ---- Navbar ---- */
+.navbar-brand {
+    font-size: 1.3rem;
+    letter-spacing: 0.02em;
+}
+
+/* ---- Table ---- */
+.table th {
+    white-space: nowrap;
+}
+
+/* ---- Input group icon alignment ---- */
+.input-group-text {
+    min-width: 45px;
+    justify-content: center;
+}
+
+/* ---- Results fade-in animation ---- */
+#results {
+    animation: fadeInUp 0.4s ease-out;
+}
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Summary card text sizing ---- */
+.card h4 {
+    font-size: 1.15rem;
+}
+@media (min-width: 992px) {
+    .card h4 {
+        font-size: 1.35rem;
+    }
+}
+
+/* ---- Footer ---- */
+footer small {
+    font-size: 0.85rem;
+}
+
+/* ---- Dark-mode specific overrides ---- */
+[data-bs-theme="dark"] .navbar {
+    background-color: #1a2744 !important;
+}
+[data-bs-theme="dark"] .card {
+    border-color: rgba(255, 255, 255, 0.08);
+}
+[data-bs-theme="dark"] .table-dark {
+    --bs-table-bg: #1e293b;
+}
+[data-bs-theme="dark"] .bg-primary {
+    --bs-bg-opacity: 0.85;
+}
+[data-bs-theme="dark"] footer {
+    background-color: #0f172a !important;
+}
+
+/* ---- Mobile responsiveness ---- */
+@media (max-width: 768px) {
+    h2 { font-size: 1.4rem; }
+    .display-4 { font-size: 1.8rem; }
+    .lead { font-size: 1rem; }
+    canvas { max-height: 280px; }
+    .feature-icon { width: 60px; height: 60px; font-size: 1.5rem; }
+    .card-body.p-5, .card-body.p-4 { padding: 1.25rem !important; }
+    .btn-lg { font-size: 0.95rem; padding: 0.5rem 1.25rem; }
+    .card .card-body.py-3 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+    .card .card-body.py-3 h4 { font-size: 1rem; }
+    .card .card-body.py-3 h6 { font-size: 0.7rem; }
+    .table-responsive { -webkit-overflow-scrolling: touch; }
+    .table { font-size: 0.8rem; }
+    .form-label { font-size: 0.85rem; }
+}
+
+@media (max-width: 576px) {
+    .display-4 { font-size: 1.5rem; }
+    .btn-lg { width: 100%; }
+    .d-flex.gap-2 .btn-lg { width: auto; }
+}
+
+/* ---- Smooth scroll ---- */
+html {
+    scroll-behavior: smooth;
+}
+
+/* ---- Theme toggle button ---- */
+#themeToggle {
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}" lang="en">
+<head><title th:text="#{simple.title}">Simple</title></head>
+<body>
+<div layout:fragment="content">
+
+    <h2 class="mb-4"><i class="fas fa-chart-line text-primary me-2"></i><span th:text="#{simple.title}">Simple Simulation</span></h2>
+
+    <!-- Form -->
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body">
+            <form th:action="@{/simple}" th:object="${request}" method="post" novalidate>
+                <div class="row g-3">
+                    <div class="col-lg-4 col-md-6">
+                        <label for="principal" class="form-label fw-bold" th:text="#{simple.form.principal}">Principal</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                            <input id="principal" type="number" step="0.01" min="0.01" class="form-control"
+                                   th:field="*{principal}" th:classappend="${#fields.hasErrors('principal')} ? 'is-invalid'"/>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('principal')}" th:errors="*{principal}"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <label for="annualRate" class="form-label fw-bold" th:text="#{simple.form.rate}">Rate</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-percent"></i></span>
+                            <input id="annualRate" type="number" step="0.01" min="0.01" class="form-control"
+                                   th:field="*{annualRate}" th:classappend="${#fields.hasErrors('annualRate')} ? 'is-invalid'"/>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('annualRate')}" th:errors="*{annualRate}"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <label for="years" class="form-label fw-bold" th:text="#{simple.form.years}">Years</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                            <input id="years" type="number" step="1" min="1" max="100" class="form-control"
+                                   th:field="*{years}" th:classappend="${#fields.hasErrors('years')} ? 'is-invalid'"/>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('years')}" th:errors="*{years}"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <label for="compoundingFrequency" class="form-label fw-bold" th:text="#{simple.form.frequency}">Frequency</label>
+                        <select id="compoundingFrequency" class="form-select" th:field="*{compoundingFrequency}">
+                            <option value="1" th:text="#{freq.annually}">Annually</option>
+                            <option value="2" th:text="#{freq.semiannually}">Semi</option>
+                            <option value="4" th:text="#{freq.quarterly}">Quarterly</option>
+                            <option value="12" th:text="#{freq.monthly}">Monthly</option>
+                            <option value="52" th:text="#{freq.weekly}">Weekly</option>
+                            <option value="365" th:text="#{freq.daily}">Daily</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <label for="periodicContribution" class="form-label fw-bold" th:text="#{simple.form.contribution}">Contribution</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-piggy-bank"></i></span>
+                            <input id="periodicContribution" type="number" step="0.01" min="0" class="form-control"
+                                   th:field="*{periodicContribution}" th:classappend="${#fields.hasErrors('periodicContribution')} ? 'is-invalid'"/>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('periodicContribution')}" th:errors="*{periodicContribution}"></div>
+                        </div>
+                        <small class="text-body-secondary" th:text="#{simple.form.contribution.help}">help</small>
+                    </div>
+                </div>
+                <div class="mt-4 d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill px-4">
+                        <i class="fas fa-calculator me-2"></i><span th:text="#{simple.form.calculate}">Calculate</span>
+                    </button>
+                    <a th:href="@{/complex}" class="btn btn-outline-warning btn-lg rounded-pill px-4">
+                        <i class="fas fa-rocket me-2"></i><span th:text="#{simple.form.switchComplex}">Switch</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div th:if="${result}" id="results">
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="card text-white bg-primary border-0 shadow-sm text-center">
+                    <div class="card-body py-3">
+                        <h6 class="card-subtitle mb-1 text-white-50" th:text="#{simple.result.finalAmount}">Final</h6>
+                        <h4 class="mb-0">$<span th:text="${#numbers.formatDecimal(result.finalAmount, 1, 'COMMA', 2, 'POINT')}"></span></h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card text-white bg-success border-0 shadow-sm text-center">
+                    <div class="card-body py-3">
+                        <h6 class="card-subtitle mb-1 text-white-50" th:text="#{simple.result.interestEarned}">Interest</h6>
+                        <h4 class="mb-0">$<span th:text="${#numbers.formatDecimal(result.totalInterestEarned, 1, 'COMMA', 2, 'POINT')}"></span></h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card text-white bg-info border-0 shadow-sm text-center">
+                    <div class="card-body py-3">
+                        <h6 class="card-subtitle mb-1 text-white-50" th:text="#{simple.result.totalContributions}">Contributions</h6>
+                        <h4 class="mb-0">$<span th:text="${#numbers.formatDecimal(result.totalContributions, 1, 'COMMA', 2, 'POINT')}"></span></h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card text-white bg-dark border-0 shadow-sm text-center">
+                    <div class="card-body py-3">
+                        <h6 class="card-subtitle mb-1 text-white-50" th:text="#{simple.result.effectiveRate}">Rate</h6>
+                        <h4 class="mb-0"><span th:text="${#numbers.formatDecimal(result.effectiveAnnualRate, 1, 2)}"></span>%</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="row g-3 mb-4">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-transparent border-0">
+                        <h5 class="mb-0"><i class="fas fa-chart-area text-primary me-2"></i><span th:text="#{simple.chart.growth}">Growth</span></h5>
+                    </div>
+                    <div class="card-body"><canvas id="growthChart" height="110"></canvas></div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-transparent border-0">
+                        <h5 class="mb-0"><i class="fas fa-chart-pie text-success me-2"></i><span th:text="#{simple.chart.pie}">Pie</span></h5>
+                    </div>
+                    <div class="card-body d-flex align-items-center justify-content-center"><canvas id="pieChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0"><i class="fas fa-chart-bar text-info me-2"></i><span th:text="#{simple.chart.bar}">Bar</span></h5>
+            </div>
+            <div class="card-body"><canvas id="barChart" height="80"></canvas></div>
+        </div>
+
+        <!-- Table -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0"><i class="fas fa-table text-secondary me-2"></i><span th:text="#{simple.table.title}">Table</span></h5>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-striped table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th th:text="#{table.year}">Year</th>
+                            <th th:text="#{table.startingBalance}">Start</th>
+                            <th th:text="#{table.interestEarned}">Interest</th>
+                            <th th:text="#{table.contributions}">Contrib</th>
+                            <th th:text="#{table.endingBalance}">End</th>
+                            <th th:text="#{table.cumulativeInterest}">Cum.Int</th>
+                            <th th:text="#{table.cumulativeContributions}">Cum.Cont</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="row : ${result.yearlyBreakdowns}">
+                            <td th:text="${row.year}"></td>
+                            <td th:text="'$' + ${#numbers.formatDecimal(row.startingBalance, 1, 'COMMA', 2, 'POINT')}"></td>
+                            <td class="text-success fw-semibold" th:text="'$' + ${#numbers.formatDecimal(row.interestEarned, 1, 'COMMA', 2, 'POINT')}"></td>
+                            <td class="text-info" th:text="'$' + ${#numbers.formatDecimal(row.contributions, 1, 'COMMA', 2, 'POINT')}"></td>
+                            <td class="fw-bold" th:text="'$' + ${#numbers.formatDecimal(row.endingBalance, 1, 'COMMA', 2, 'POINT')}"></td>
+                            <td th:text="'$' + ${#numbers.formatDecimal(row.cumulativeInterest, 1, 'COMMA', 2, 'POINT')}"></td>
+                            <td th:text="'$' + ${#numbers.formatDecimal(row.cumulativeContributions, 1, 'COMMA', 2, 'POINT')}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div layout:fragment="scripts" th:if="${result}">
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const result = /*[[${result}]]*/ {};
+    const bd = result.yearlyBreakdowns;
+    const labels = bd.map(b => b.year);
+    const fmtM = v => '$' + v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+
+    new Chart(document.getElementById('growthChart').getContext('2d'), {
+        type:'line', data:{ labels:labels, datasets:[
+            {label:i18n.totalBalance, data:bd.map(b=>b.endingBalance), borderColor:'#0d6efd', backgroundColor:'rgba(13,110,253,.08)', fill:true, tension:.35, pointRadius:3},
+            {label:i18n.cumulativeInterest, data:bd.map(b=>b.cumulativeInterest), borderColor:'#198754', backgroundColor:'rgba(25,135,84,.08)', fill:true, tension:.35, pointRadius:3},
+            {label:i18n.cumulativeContributions, data:bd.map(b=>b.cumulativeContributions), borderColor:'#0dcaf0', backgroundColor:'rgba(13,202,240,.08)', fill:true, tension:.35, pointRadius:3}
+        ]}, options:{responsive:true, interaction:{mode:'index',intersect:false}, plugins:{legend:{position:'top'}}, scales:{y:{beginAtZero:true,ticks:{callback:fmtM}}}}
+    });
+
+    new Chart(document.getElementById('pieChart').getContext('2d'), {
+        type:'doughnut', data:{ labels:[i18n.initialPrincipal, i18n.interestEarned, i18n.contributions],
+            datasets:[{data:[result.initialPrincipal, result.totalInterestEarned, result.totalContributions],
+            backgroundColor:['#0d6efd','#198754','#0dcaf0'], borderWidth:2, hoverOffset:8}]
+        }, options:{responsive:true, plugins:{legend:{position:'bottom'}, tooltip:{callbacks:{label:c=>c.label+': '+fmtM(c.parsed)}}}}
+    });
+
+    new Chart(document.getElementById('barChart').getContext('2d'), {
+        type:'bar', data:{ labels:labels, datasets:[{label:i18n.interestPerYear, data:bd.map(b=>b.interestEarned),
+            backgroundColor:'rgba(13,202,240,.6)', borderColor:'#0dcaf0', borderWidth:1}]
+        }, options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,ticks:{callback:fmtM}}}}
+    });
+    /*]]>*/
+</script>
+</div>
+</body>
+</html>

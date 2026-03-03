@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      th:lang="${#locale.language}" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE" th:text="#{nav.brand}">CompoundCalc</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" th:content="#{seo.description}">
+    <meta name="keywords" th:content="#{seo.keywords}">
+    <meta name="author" content="CompoundCalc">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" th:content="#{index.title}">
+    <meta property="og:description" th:content="#{seo.description}">
+    <meta property="og:locale" th:content="${#locale.language == 'es' ? 'es_ES' : 'en_US'}">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png}">
+    <link rel="apple-touch-icon" th:href="@{/img/favicon.png}">
+
+    <!-- Bootstrap 5.3 (supports data-bs-theme for dark mode) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/styles.css}" rel="stylesheet">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "CompoundCalc",
+      "description": "Compound Interest Calculator with simple and complex simulations",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    }
+    </script>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" th:href="@{/}">
+                <i class="fas fa-calculator me-2"></i><span th:text="#{nav.brand}">CompoundCalc</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                    aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/simple}">
+                            <i class="fas fa-chart-line me-1"></i><span th:text="#{nav.simple}">Simple</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/complex}">
+                            <i class="fas fa-chart-area me-1"></i><span th:text="#{nav.complex}">Complex</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/swagger-ui.html" target="_blank">
+                            <i class="fas fa-code me-1"></i><span th:text="#{nav.api}">API</span>
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-globe me-1"></i><span th:text="#{nav.language}">Idioma</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" th:href="${'?lang=es'}">Espa&#241;ol</a></li>
+                            <li><a class="dropdown-item" th:href="${'?lang=en'}">English</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <button id="themeToggle" class="btn btn-sm btn-outline-light ms-lg-2" type="button"
+                                aria-label="Toggle dark mode">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Content -->
+    <main class="container py-4 flex-grow-1">
+        <div layout:fragment="content"></div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-3 mt-auto">
+        <div class="container text-center">
+            <small th:text="#{footer.copyright}">&copy; 2024 CompoundCalc</small>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script th:src="@{/js/app.js}"></script>
+
+    <!-- i18n labels for Chart.js (consumed by chart scripts) -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        window.i18n = {
+            totalBalance:            /*[[#{chart.totalBalance}]]*/            'Total Balance',
+            cumulativeInterest:      /*[[#{chart.cumulativeInterest}]]*/      'Cumulative Interest',
+            cumulativeContributions: /*[[#{chart.cumulativeContributions}]]*/ 'Cumulative Contributions',
+            initialPrincipal:        /*[[#{chart.initialPrincipal}]]*/        'Initial Principal',
+            interestEarned:          /*[[#{chart.interestEarned}]]*/          'Interest Earned',
+            contributions:           /*[[#{chart.contributions}]]*/           'Contributions',
+            interestPerYear:         /*[[#{chart.interestPerYear}]]*/         'Interest per Year',
+            nominalBalance:          /*[[#{chart.nominalBalance}]]*/          'Nominal Balance',
+            inflationAdjusted:       /*[[#{chart.inflationAdjusted}]]*/       'Inflation Adjusted',
+            finalBalancePercentile:  /*[[#{chart.finalBalancePercentile}]]*/ 'Final Balance',
+            mcP10: /*[[#{mc.p10}]]*/ 'P10', mcP25: /*[[#{mc.p25}]]*/ 'P25',
+            mcP50: /*[[#{mc.p50}]]*/ 'P50', mcP75: /*[[#{mc.p75}]]*/ 'P75',
+            mcP90: /*[[#{mc.p90}]]*/ 'P90'
+        };
+        /*]]>*/
+    </script>
+
+    <div layout:fragment="scripts"></div>
+</body>
+</html>
