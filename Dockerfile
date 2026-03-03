@@ -1,31 +1,25 @@
-# ---- Stage 1: Build ----
-FROM eclipse-temurin:22-jdk AS build
+# ---- Stage 1: Build (Usando imagen oficial de Maven) ----
+FROM maven:3.9.6-eclipse-temurin-22 AS build
 WORKDIR /app
 
-# Cache Maven dependencies
+# Copiamos el pom.xml para descargar dependencias y aprovechar la caché de Docker
 COPY pom.xml .
-COPY .mvn .mvn
-COPY mvnw mvnw
-# If mvnw is not present, use Maven from the image directly
-RUN if [ -f mvnw ]; then chmod +x mvnw && ./mvnw dependency:go-offline -B; \
-    else apt-get update && apt-get install -y maven && mvn dependency:go-offline -B; fi
+RUN mvn dependency:go-offline -B
 
-# Copy source and build
-COPY src src
-RUN if [ -f mvnw ]; then ./mvnw package -DskipTests -B; \
-    else mvn package -DskipTests -B; fi
+# Copiamos el código fuente y compilamos
+COPY src ./src
+RUN mvn clean package -DskipTests -B
 
-# ---- Stage 2: Runtime ----
-FROM eclipse-temurin:22-jre
+# ---- Stage 2: Runtime (Imagen ligera para ejecutar) ----
+FROM eclipse-temurin:22-jre-alpine
 WORKDIR /app
 
-# Non-root user for security
-RUN groupadd -r appuser && useradd -r -g appuser appuser
-
-COPY --from=build /app/target/*.jar app.jar
-
-RUN chown appuser:appuser app.jar
+# Crear un usuario sin privilegios por seguridad
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
+
+# Copiamos el jar desde la etapa de build
+COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
 
