@@ -23,6 +23,15 @@
     <link rel="icon" type="image/png" th:href="@{/img/favicon.png}">
     <link rel="apple-touch-icon" th:href="@{/img/favicon.png}">
 
+    <!-- Theme color for mobile browsers -->
+    <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0b1120" media="(prefers-color-scheme: dark)">
+
+    <!-- Fonts: Inter (UI) + JetBrains Mono (formula) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
     <!-- Bootstrap 5.3 (supports data-bs-theme for dark mode) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
@@ -43,11 +52,14 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
 
+    <!-- Skip to main content (accessibility) -->
+    <a class="skip-link" href="#main-content" th:text="#{a11y.skip}">Saltar al contenido principal</a>
+
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <nav class="navbar navbar-expand-lg shadow-sm" aria-label="Main navigation">
         <div class="container">
-            <a class="navbar-brand fw-bold" th:href="@{/}">
-                <i class="fas fa-calculator me-2"></i><span th:text="#{nav.brand}">CompoundCalc</span>
+            <a class="navbar-brand fw-bold" th:href="@{/}" aria-label="CompoundCalc — Inicio">
+                <i class="fas fa-calculator" aria-hidden="true"></i><span th:text="#{nav.brand}">CompoundCalc</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
                     aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,9 +92,10 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <button id="themeToggle" class="btn btn-sm btn-outline-light ms-lg-2" type="button"
-                                aria-label="Toggle dark mode">
-                            <i class="fas fa-moon" id="themeIcon"></i>
+                        <button id="themeToggle" class="ms-lg-2" type="button"
+                                aria-label="Cambiar tema claro/oscuro" aria-pressed="false" title="Cambiar tema">
+                            <i class="fas fa-moon" id="themeIcon" aria-hidden="true"></i>
+                            <span class="visually-hidden">Cambiar tema</span>
                         </button>
                     </li>
                 </ul>
@@ -91,14 +104,14 @@
     </nav>
 
     <!-- Page Content -->
-    <main class="container py-4 flex-grow-1">
+    <main id="main-content" class="container py-4 flex-grow-1" role="main" tabindex="-1">
         <div layout:fragment="content"></div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-dark text-light py-3 mt-auto">
+    <footer class="py-4 mt-auto" role="contentinfo">
         <div class="container text-center">
-            <small th:text="#{footer.copyright}">&copy; 2024 CompoundCalc</small>
+            <small th:text="#{footer.copyright}">&copy; 2026 CompoundCalc</small>
         </div>
     </footer>
 

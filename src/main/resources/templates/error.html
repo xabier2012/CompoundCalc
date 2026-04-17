@@ -5,16 +5,18 @@
 <head><title th:text="#{error.title}">Error</title></head>
 <body>
 <div layout:fragment="content">
-    <div class="row justify-content-center mt-5">
+    <div class="row justify-content-center mt-5" role="alert" aria-live="assertive">
         <div class="col-md-6 text-center">
             <div class="card shadow-sm border-0">
                 <div class="card-body p-5">
-                    <i class="fas fa-exclamation-triangle text-danger fa-4x mb-4"></i>
+                    <div class="feature-icon bg-warning bg-gradient text-white rounded-circle mb-4 mx-auto" aria-hidden="true">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
                     <h2 class="fw-bold" th:text="#{error.title}">Error</h2>
-                    <p class="text-body-secondary" th:text="${message} ?: #{error.message}">Unexpected error</p>
+                    <p class="text-body-secondary mt-2" th:text="${message} ?: #{error.message}">Unexpected error</p>
                     <p class="text-body-secondary small" th:if="${timestamp}" th:text="'Timestamp: ' + ${timestamp}"></p>
                     <a th:href="@{/}" class="btn btn-primary mt-3 rounded-pill px-4">
-                        <i class="fas fa-home me-2"></i><span th:text="#{error.back}">Back</span>
+                        <i class="fas fa-home me-2" aria-hidden="true"></i><span th:text="#{error.back}">Back</span>
                     </a>
                 </div>
             </div>

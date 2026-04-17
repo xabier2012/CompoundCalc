@@ -6,12 +6,12 @@
 <body>
 <div layout:fragment="content">
 
-    <div class="text-center mb-5">
+    <header class="text-center mb-5">
         <h1 class="display-4 fw-bold text-primary">
-            <i class="fas fa-coins me-2"></i><span th:text="#{index.title}">Calculadora</span>
+            <i class="fas fa-coins me-2" aria-hidden="true"></i><span th:text="#{index.title}">Calculadora</span>
         </h1>
-        <p class="lead text-body-secondary mt-3" th:text="#{index.subtitle}">Subtitle</p>
-    </div>
+        <p class="lead text-body-secondary mt-3 mx-auto" style="max-width: 640px;" th:text="#{index.subtitle}">Subtitle</p>
+    </header>
 
     <div class="row g-4 justify-content-center">
         <!-- Simple card -->
