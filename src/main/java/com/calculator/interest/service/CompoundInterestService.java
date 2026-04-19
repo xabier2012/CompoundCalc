@@ -35,6 +35,8 @@ public class CompoundInterestService {
 
     private static final Logger log = LoggerFactory.getLogger(CompoundInterestService.class);
     private static final int SCALE = 2;
+    private static final double DEFAULT_VOLATILITY_RATIO = 0.30;
+    private static final double MIN_ANNUAL_RETURN = -0.50;
 
     /**
      * Calculates simple compound interest year by year.
@@ -211,7 +213,7 @@ public class CompoundInterestService {
         if (request.getMonteCarloSimulations() != null && request.getMonteCarloSimulations() > 0) {
             double vol = request.getVolatility() != null
                     ? request.getVolatility() / 100.0
-                    : rate * 0.30;
+                    : rate * DEFAULT_VOLATILITY_RATIO;
             runMonteCarloSimulation(builder, request, vol);
         }
 
@@ -246,7 +248,7 @@ public class CompoundInterestService {
             double currentContrib = monthlyContrib;
 
             for (int year = 1; year <= years; year++) {
-                double yearRate = Math.max(normalDist.sample(), -0.50);
+                double yearRate = Math.max(normalDist.sample(), MIN_ANNUAL_RETURN);
 
                 for (int month = 1; month <= 12; month++) {
                     balance += currentContrib;
