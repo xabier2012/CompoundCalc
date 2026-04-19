@@ -22,10 +22,18 @@
             if (themeIcon) {
                 themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
             }
+            if (toggleBtn) {
+                toggleBtn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+            }
         }
 
-        // Initialise icon based on current theme
-        const current = document.documentElement.getAttribute('data-bs-theme') || 'light';
+        // Initialise icon based on current theme (respect OS preference on first visit)
+        let current = document.documentElement.getAttribute('data-bs-theme');
+        if (!stored) {
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            current = prefersDark ? 'dark' : 'light';
+        }
+        current = current || 'light';
         applyTheme(current);
 
         if (toggleBtn) {
@@ -38,7 +46,11 @@
         // ---- Smooth scroll to results after form submission ----
         const resultsSection = document.getElementById('results');
         if (resultsSection) {
-            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            resultsSection.scrollIntoView({
+                behavior: prefersReducedMotion ? 'auto' : 'smooth',
+                block: 'start'
+            });
         }
     });
 })();
