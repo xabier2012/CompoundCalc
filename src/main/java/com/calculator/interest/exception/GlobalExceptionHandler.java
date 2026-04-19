@@ -1,5 +1,6 @@
 package com.calculator.interest.exception;
 
+import com.itextpdf.text.DocumentException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +14,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -36,11 +38,11 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public Map<String, Object> handleValidationErrors(MethodArgumentNotValidException ex) {
-        Map<String, Object> body = new HashMap<>();
+        Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now().toString());
         body.put("status", HttpStatus.BAD_REQUEST.value());
 
-        Map<String, String> fieldErrors = new HashMap<>();
+        Map<String, String> fieldErrors = new LinkedHashMap<>();
         ex.getBindingResult().getFieldErrors()
                 .forEach(e -> fieldErrors.put(e.getField(), e.getDefaultMessage()));
         body.put("errors", fieldErrors);
@@ -67,10 +69,28 @@ public class GlobalExceptionHandler {
     public Map<String, Object> handleIllegalArgument(IllegalArgumentException ex) {
         log.error("Invalid argument: {}", ex.getMessage());
 
-        Map<String, Object> body = new HashMap<>();
+        Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now().toString());
         body.put("status", HttpStatus.BAD_REQUEST.value());
         body.put("message", ex.getMessage());
+        return body;
+    }
+
+    /**
+     * Handles failures during export generation (CSV/Excel/PDF/JSON).
+     * Returns JSON so REST clients receive a machine-readable error instead of
+     * the HTML error template.
+     */
+    @ExceptionHandler({IOException.class, DocumentException.class})
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public Map<String, Object> handleExportError(Exception ex) {
+        log.error("Export failed", ex);
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now().toString());
+        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        body.put("message", "Failed to generate export file");
         return body;
     }
 

@@ -57,7 +57,7 @@ public class ExportService {
             "Inflation Adjusted Balance"
     };
 
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     /**
      * Serialises the simulation result into RFC-4180 compliant CSV bytes.
@@ -156,52 +156,56 @@ public class ExportService {
         Document document = new Document(PageSize.A4.rotate());
         PdfWriter.getInstance(document, baos);
         document.open();
+        try {
+            // Title
+            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, BaseColor.DARK_GRAY);
+            Paragraph title = new Paragraph("Compound Interest Simulation Report", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            title.setSpacingAfter(20);
+            document.add(title);
 
-        // Title
-        Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, BaseColor.DARK_GRAY);
-        Paragraph title = new Paragraph("Compound Interest Simulation Report", titleFont);
-        title.setAlignment(Element.ALIGN_CENTER);
-        title.setSpacingAfter(20);
-        document.add(title);
+            // Summary
+            Font sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.BLACK);
+            document.add(new Paragraph("Summary", sectionFont));
+            document.add(new Paragraph(String.format("Initial Principal: $%,.2f", response.getInitialPrincipal())));
+            document.add(new Paragraph(String.format("Final Amount: $%,.2f", response.getFinalAmount())));
+            document.add(new Paragraph(String.format("Total Interest Earned: $%,.2f", response.getTotalInterestEarned())));
+            document.add(new Paragraph(String.format("Total Contributions: $%,.2f", response.getTotalContributions())));
+            document.add(new Paragraph(String.format("Effective Annual Rate: %.2f%%", response.getEffectiveAnnualRate())));
+            document.add(new Paragraph(String.format("After-Tax Final Amount: $%,.2f", response.getAfterTaxFinalAmount())));
+            document.add(new Paragraph(" "));
 
-        // Summary
-        Font sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.BLACK);
-        document.add(new Paragraph("Summary", sectionFont));
-        document.add(new Paragraph(String.format("Initial Principal: $%,.2f", response.getInitialPrincipal())));
-        document.add(new Paragraph(String.format("Final Amount: $%,.2f", response.getFinalAmount())));
-        document.add(new Paragraph(String.format("Total Interest Earned: $%,.2f", response.getTotalInterestEarned())));
-        document.add(new Paragraph(String.format("Total Contributions: $%,.2f", response.getTotalContributions())));
-        document.add(new Paragraph(String.format("Effective Annual Rate: %.2f%%", response.getEffectiveAnnualRate())));
-        document.add(new Paragraph(String.format("After-Tax Final Amount: $%,.2f", response.getAfterTaxFinalAmount())));
-        document.add(new Paragraph(" "));
+            // Table
+            PdfPTable table = new PdfPTable(BREAKDOWN_HEADERS.length);
+            table.setWidthPercentage(100);
 
-        // Table
-        PdfPTable table = new PdfPTable(BREAKDOWN_HEADERS.length);
-        table.setWidthPercentage(100);
+            Font thFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 8, BaseColor.WHITE);
+            for (String header : BREAKDOWN_HEADERS) {
+                PdfPCell cell = new PdfPCell(new Phrase(header, thFont));
+                cell.setBackgroundColor(new BaseColor(52, 73, 94));
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                cell.setPadding(5);
+                table.addCell(cell);
+            }
 
-        Font thFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 8, BaseColor.WHITE);
-        for (String header : BREAKDOWN_HEADERS) {
-            PdfPCell cell = new PdfPCell(new Phrase(header, thFont));
-            cell.setBackgroundColor(new BaseColor(52, 73, 94));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            cell.setPadding(5);
-            table.addCell(cell);
+            Font tdFont = FontFactory.getFont(FontFactory.HELVETICA, 7);
+            for (YearlyBreakdown b : response.getYearlyBreakdowns()) {
+                table.addCell(new Phrase(String.valueOf(b.getYear()), tdFont));
+                table.addCell(new Phrase(String.format("$%,.2f", b.getStartingBalance()), tdFont));
+                table.addCell(new Phrase(String.format("$%,.2f", b.getInterestEarned()), tdFont));
+                table.addCell(new Phrase(String.format("$%,.2f", b.getContributions()), tdFont));
+                table.addCell(new Phrase(String.format("$%,.2f", b.getEndingBalance()), tdFont));
+                table.addCell(new Phrase(String.format("$%,.2f", b.getCumulativeInterest()), tdFont));
+                table.addCell(new Phrase(String.format("$%,.2f", b.getCumulativeContributions()), tdFont));
+                table.addCell(new Phrase(String.format("$%,.2f", b.getInflationAdjustedBalance()), tdFont));
+            }
+
+            document.add(table);
+        } finally {
+            if (document.isOpen()) {
+                document.close();
+            }
         }
-
-        Font tdFont = FontFactory.getFont(FontFactory.HELVETICA, 7);
-        for (YearlyBreakdown b : response.getYearlyBreakdowns()) {
-            table.addCell(new Phrase(String.valueOf(b.getYear()), tdFont));
-            table.addCell(new Phrase(String.format("$%,.2f", b.getStartingBalance()), tdFont));
-            table.addCell(new Phrase(String.format("$%,.2f", b.getInterestEarned()), tdFont));
-            table.addCell(new Phrase(String.format("$%,.2f", b.getContributions()), tdFont));
-            table.addCell(new Phrase(String.format("$%,.2f", b.getEndingBalance()), tdFont));
-            table.addCell(new Phrase(String.format("$%,.2f", b.getCumulativeInterest()), tdFont));
-            table.addCell(new Phrase(String.format("$%,.2f", b.getCumulativeContributions()), tdFont));
-            table.addCell(new Phrase(String.format("$%,.2f", b.getInflationAdjustedBalance()), tdFont));
-        }
-
-        document.add(table);
-        document.close();
 
         return baos.toByteArray();
     }
@@ -211,7 +215,7 @@ public class ExportService {
      */
     public byte[] exportToJson(SimulationResponse response) {
         log.info("Exporting simulation results to JSON");
-        return gson.toJson(response).getBytes(StandardCharsets.UTF_8);
+        return GSON.toJson(response).getBytes(StandardCharsets.UTF_8);
     }
 
     private void createTextCell(Row row, int col, String value, CellStyle style) {
